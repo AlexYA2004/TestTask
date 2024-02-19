@@ -42,6 +42,8 @@ namespace TestTask.Services.ConcrateServices
 
             productToDisable.IsAvailaleToOrder = false;
 
+            _productRepository.UpdateAsync(productToDisable);
+
             return true;
         }
 

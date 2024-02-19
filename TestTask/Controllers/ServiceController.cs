@@ -139,7 +139,7 @@ namespace TestTask.Controllers
             {
                 var productInOrder = products.FirstOrDefault(p => p.Name == productName);
 
-                if (productInOrder != null)
+                if (productInOrder == null)
                     return BadRequest($"Товар с именем '{productName}' не найден.");
 
                 await _productAndOrderService.SetProductAndOrder(productInOrder.Id, newOrder.Id);
