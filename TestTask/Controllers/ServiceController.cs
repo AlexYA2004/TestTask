@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using TestTask.Entities;
+using TestTask.Entities.Models;
+using TestTask.Services.Authorization;
 using TestTask.Services.Interfaces;
 
 namespace TestTask.Controllers
@@ -17,7 +21,13 @@ namespace TestTask.Controllers
 
         private IProductAndOrderService _productAndOrderService;
 
-        public ServiceController(ILogger<ServiceController> logger, IProductService productService, IOrderService orderService, IProductAndOrderService productAndOrderService)
+        private IUserService _userService;
+
+        public ServiceController(ILogger<ServiceController> logger,
+                                 IProductService productService,
+                                 IOrderService orderService,
+                                 IProductAndOrderService productAndOrderService,
+                                 IUserService userService)
         {
             _logger = logger;
 
@@ -26,6 +36,8 @@ namespace TestTask.Controllers
             _orderService = orderService;
 
             _productAndOrderService = productAndOrderService;
+
+            _userService = userService;
         }
 
         [HttpGet("products")]
@@ -90,7 +102,7 @@ namespace TestTask.Controllers
         }
 
 
-
+        [JwtAuthorize]
         [HttpPost("add_new_product")]
         public async Task<ActionResult<string>> AddNewProduct([FromBody] ProductInfo product)
         {
@@ -115,7 +127,7 @@ namespace TestTask.Controllers
             return Ok($"Товар {product.Name} добавлен в доступные для заказа");
         }
 
-
+        [JwtAuthorize]
         [HttpDelete("remove_product")]
         public async Task<ActionResult<string>> RemoveProduct([FromBody] ProductInfo product)
         {
@@ -125,7 +137,7 @@ namespace TestTask.Controllers
             return Ok($"Товар успешно удалён из доступных для заказа");
         }
 
-
+        [JwtAuthorize]
         [HttpPost("create_order")]
         public async Task<ActionResult<string>> CreateOrder([FromBody] List<string> productsNames)
         {
@@ -149,7 +161,21 @@ namespace TestTask.Controllers
             return Ok($"Заказ создан успешно");
         }
 
+        [JwtAuthorize]
+        [HttpPut("get_user_orders")]
+        public async Task<ActionResult<IEnumerable<OrderInfo>>> GetUserOrders([FromBody]string userName)
+        {
+            var user = _userService.GetAllUsers().Where(p => p.UserName == userName).FirstOrDefault();
 
+            if (user == null)
+                return NotFound();
+
+            var response = _orderService.GetUserOrdersByUserId(user.Id);
+
+            return Ok(response);
+        }
+
+        [JwtAuthorize]
         [HttpDelete("remove_order")]
         public async Task<ActionResult<string>> RemoveOrder([FromBody] OrderInfo orderInfo)
         {
@@ -187,6 +213,53 @@ namespace TestTask.Controllers
             return Ok($"Заказ успешно отменен");
 
         }
+
+        [JwtAuthorize]
+        [HttpPut("find_products_by_name")]
+        public async Task<ActionResult<List<ProductInfo>>> FindProductsByName([FromBody] string productName)
+        {
+            var products =  _productService.FindProducts(productName);
+
+            if (products == null) return NotFound("Товары не найдены");
+
+            IEnumerable<ProductInfo> result = from product in products
+                                              select new ProductInfo
+                                              {
+                                                  Description = product.Description,
+
+                                                  Name = product.Name,
+
+                                                  Price = product.Price,
+                                              };
+
+            return Ok(result);
+        }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<UserAuthorizeModel>> Register([FromBody] UserRegisterModel user)
+        {
+            var response = await _userService.Register(user);
+
+            if (response == null) 
+                return NotFound("Пользователь с таким именем уже существует");
+
+            var newModel = new UserAuthorizeModel()
+            {
+                UserName = user.UserName,
+
+                Password = user.Password,
+
+                Token = response
+            };
+
+            return Ok(newModel);
+        }
+
+        //[HttpPost("authorize")]
+        //public async Task<ActionResult<UserAuthorizeModel>> Authorize([FromBody] UserAuthorizeModel user)
+        //{
+        //}
+
     }
 }
 

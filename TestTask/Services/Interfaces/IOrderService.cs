@@ -11,8 +11,7 @@ namespace TestTask.Services.Interfaces
         Task SaveOrder(Order order);
 
         Task DeleteOrder(Order order);
+
+        IEnumerable<Order> GetUserOrdersByUserId(Guid userId);
     }
-
-
-
 }

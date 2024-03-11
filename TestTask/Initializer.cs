@@ -15,6 +15,8 @@ namespace TestTask
             services.AddScoped<IOrderService, OrderService>();
 
             services.AddScoped<IProductAndOrderService, ProductAndOrderService>();
+
+            services.AddScoped<IUserService, UserService>();
         }
 
         public static void InitializeRepositories(this IServiceCollection services) 
@@ -24,6 +26,8 @@ namespace TestTask
             services.AddScoped<IBaseRepository<Order>, OrderRepository>();
 
             services.AddScoped<IBaseRepository<ProductAndOrder>, ProductAndOrderRepository>();
+
+            services.AddScoped<IBaseRepository<User>, UserRepository>();
         }
     }
 }

@@ -44,5 +44,11 @@ namespace TestTask.Services.ConcrateServices
         {
             await _orderRepository.CreateAsync(order);
         }
+
+
+        public IEnumerable<Order> GetUserOrdersByUserId(Guid userId) 
+        {
+            return _orderRepository.GetAll().Where(o=>o.UserId == userId);
+        }
     }
 }
