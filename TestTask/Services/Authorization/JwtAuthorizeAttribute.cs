@@ -28,7 +28,7 @@ namespace TestTask.Services.Authorization
                 try
                 {
                     var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = Encoding.ASCII.GetBytes(Config.SecretKey;);
+                    var key = Encoding.ASCII.GetBytes(Config.SecretKey);
 
                     tokenHandler.ValidateToken(token, new TokenValidationParameters
                     {
