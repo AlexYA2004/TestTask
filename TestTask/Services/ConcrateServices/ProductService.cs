@@ -1,6 +1,7 @@
 ﻿using TestTask.DAL.Interfaces;
 using TestTask.DAL.Repositories;
 using TestTask.Entities;
+using TestTask.Entities.Models;
 using TestTask.Services.Interfaces;
 
 namespace TestTask.Services.ConcrateServices
@@ -45,6 +46,12 @@ namespace TestTask.Services.ConcrateServices
             _productRepository.UpdateAsync(productToDisable);
 
             return true;
+        }
+
+        public IEnumerable<Product> FindProducts(string searchString)
+        {
+            return _productRepository.GetAll().Where(x => x.Name.ToLower().Contains(searchString.ToLower()) || x.Description.ToLower()
+            .Contains(searchString.ToLower()));
         }
 
         public IEnumerable<Product> GetAllProducts()

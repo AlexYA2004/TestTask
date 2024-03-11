@@ -12,6 +12,10 @@ namespace TestTask.DAL
 
         public DbSet<ProductAndOrder> ProductsAndOrders { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
+   
+
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
             base.ConfigureConventions(configurationBuilder);
@@ -37,6 +41,11 @@ namespace TestTask.DAL
                 .HasOne(po => po.Order)
                 .WithMany(o => o.ProductsAndOrder)
                 .HasForeignKey(po => po.OrderId);
+
+            modelBuilder.Entity<Order>()
+            .HasOne(o => o.User) // У каждого заказа есть один пользователь
+            .WithMany(u => u.Orders)   // У каждого пользователя много заказов
+            .HasForeignKey(o => o.UserId);
         }
     }
 }

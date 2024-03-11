@@ -1,4 +1,5 @@
 ﻿using TestTask.Entities;
+using TestTask.Entities.Models;
 
 namespace TestTask.Services.Interfaces
 {
@@ -11,6 +12,8 @@ namespace TestTask.Services.Interfaces
         bool AbleProductById(Guid id);
 
         IEnumerable<Product> GetAllProducts();
+
+        IEnumerable<Product> FindProducts(string searchString);
     }
 }
     

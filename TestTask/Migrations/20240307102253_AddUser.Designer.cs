@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TestTask.DAL;
 
@@ -11,9 +12,11 @@ using TestTask.DAL;
 namespace TestTask.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240307102253_AddUser")]
+    partial class AddUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,12 +34,7 @@ namespace TestTask.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -97,18 +95,22 @@ namespace TestTask.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
-            modelBuilder.Entity("TestTask.Entities.Order", b =>
+            modelBuilder.Entity("TestTask.Entities.UserOrder", b =>
                 {
-                    b.HasOne("TestTask.Entities.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("User");
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "OrderId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("UserOrder");
                 });
 
             modelBuilder.Entity("TestTask.Entities.ProductAndOrder", b =>
@@ -130,9 +132,30 @@ namespace TestTask.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("TestTask.Entities.UserOrder", b =>
+                {
+                    b.HasOne("TestTask.Entities.Order", "Order")
+                        .WithMany("UserOrders")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TestTask.Entities.User", "User")
+                        .WithMany("UserOrders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TestTask.Entities.Order", b =>
                 {
                     b.Navigation("ProductsAndOrder");
+
+                    b.Navigation("UserOrders");
                 });
 
             modelBuilder.Entity("TestTask.Entities.Product", b =>
@@ -142,7 +165,7 @@ namespace TestTask.Migrations
 
             modelBuilder.Entity("TestTask.Entities.User", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("UserOrders");
                 });
 #pragma warning restore 612, 618
         }
