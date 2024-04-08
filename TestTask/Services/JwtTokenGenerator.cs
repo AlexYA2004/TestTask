@@ -22,6 +22,7 @@ namespace TestTask.Services
                 Issuer = Config.Issuer
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
+
             return tokenHandler.WriteToken(token);
         }
     }
