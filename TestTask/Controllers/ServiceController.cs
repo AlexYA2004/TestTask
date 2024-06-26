@@ -255,10 +255,15 @@ namespace TestTask.Controllers
             return Ok(newModel);
         }
 
-        //[HttpPost("authorize")]
-        //public async Task<ActionResult<UserAuthorizeModel>> Authorize([FromBody] UserAuthorizeModel user)
-        //{
-        //}
+        [HttpPost("authorize")]
+        public async Task<ActionResult<UserAuthorizeModel>> Authorize([FromBody] UserAuthorizeModel user)
+        {
+            var result = await _userService.Authorize(user);
+
+            if (result == null) return NotFound(result);
+
+            return Ok(result);
+        }
 
     }
 }
